@@ -2,3 +2,7 @@ node_modules/
 dist/
 .DS_Store
 
+cd /run/media/aquilivio/aquilivio/Lab/smart-office
+npm run prepare:v36 &&
+(cd android && ./gradlew assembleRelease) &&
+cp android/app/build/outputs/apk/release/app-release.apk smart-office-v36.apk
