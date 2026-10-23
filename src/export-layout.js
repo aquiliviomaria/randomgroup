@@ -43,6 +43,7 @@ export async function exportFooter() {
   footer.style.cssText =
     "padding:12px 30px 0;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:12px;color:#526078";
   const date = document.createElement("span");
+  date.style.whiteSpace = "nowrap";
   date.textContent = new Date().toLocaleString("pt-PT", {
     timeZone: "Africa/Maputo",
   });

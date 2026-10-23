@@ -2,7 +2,7 @@
 
 **Juntos, por acaso.**
 
-Aplicação para juntar pessoas, distribuir ideias e organizar jogos sem favoritismos. 
+Aplicação para juntar pessoas, distribuir ideias e organizar jogos sem favoritismos.
 
 Uma página de cinco cards: **Grupos**, **Ordem**, **Temas**, **Com critérios** e **Mata-mata**. Cada sorteio é uma jornada: participantes → preferências → revisão → revelação animada. Não há sidebar, painel de gestão, contas ou formulários todos abertos ao mesmo tempo.
 
@@ -23,7 +23,9 @@ De **Aquilivio Maria Cumbe**, Inhambane, Moçambique.
 3. **Defina as preferências:** quantidade de grupos, temas, quotas ou modo de decisão dos jogos, conforme o sorteio escolhido.
 4. **Reveja:** a aplicação verifica nomes repetidos, limites e regras impossíveis antes do sorteio.
 5. **Acompanhe:** os resultados aparecem com animações, um nome por vez. Pode acelerar ou mostrar tudo.
-6. **Guarde:** descarregue o relatório em PDF com a assinatura do criador em todas as páginas.
+6. **Guarde:** descarregue os resultados em PDF ou PNG, com logo, QR code do app e assinatura. Listas grandes em PNG são divididas em imagens num ZIP.
+
+Ao entrar no site, um aviso permite instalar a aplicação ou fechar para continuar. O aviso volta numa nova visita e fica oculto quando a aplicação é aberta em modo instalado.
 
 ## 🔥 Por que usar?
 

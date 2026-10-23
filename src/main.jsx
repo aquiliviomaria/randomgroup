@@ -72,7 +72,7 @@ const MODES = [
     title: "Grupos",
     icon: Users,
     color: "blue",
-    description: "Crie equipas equilibradas.",
+    description: "Equipas equilibradas.",
     detail: "Equipas equilibradas, ao acaso.",
   },
   {
@@ -80,7 +80,7 @@ const MODES = [
     title: "Ordem",
     icon: ListOrdered,
     color: "green",
-    description: "Sorteie quem vai primeiro.",
+    description: "Quem vai primeiro?",
     detail: "Uma posição para cada pessoa.",
   },
   {
@@ -88,7 +88,7 @@ const MODES = [
     title: "Temas",
     icon: BookOpen,
     color: "red",
-    description: "Um tema para cada grupo.",
+    description: "Um tema por grupo.",
     detail: "Grupos e temas num só sorteio.",
   },
   {
@@ -96,7 +96,7 @@ const MODES = [
     title: "Com critérios",
     icon: SlidersHorizontal,
     color: "purple",
-    description: "Misture pessoas com as suas regras.",
+    description: "Grupos com as suas regras.",
     detail: "Cursos, género e o que precisar.",
   },
   {
@@ -104,7 +104,7 @@ const MODES = [
     title: "Mata-mata",
     icon: Trophy,
     color: "orange",
-    description: "Dos confrontos ao campeão.",
+    description: "Confrontos até à final.",
     detail: "Confrontos, resultados e campeão.",
   },
 ];
@@ -231,9 +231,6 @@ function App() {
         )}
       </main>
       <footer className="footer">
-        <span>
-          Um pouco de sorte. <strong>Muitas possibilidades.</strong>
-        </span>
         <div className="socials">
           <a
             href="https://wa.me/258874544510"
@@ -261,7 +258,7 @@ function App() {
           </a>
         </div>
         <small>
-          © {new Date().getFullYear()} RandomGroup · Aquilivio Maria Cumbe
+          © RandomGroup · Created &amp; Designed by Aquilivio Maria Cumbe
         </small>
       </footer>
       {notice && (
@@ -362,7 +359,9 @@ function Home({ onStart }) {
               <h2>{m.title}</h2>
               <p>{m.description}</p>
               <Button onClick={() => onStart(m.id)}>
-                Começar sorteio <ArrowRight size={20} />
+                <span className="start-desktop">Começar sorteio</span>
+                <span className="start-mobile">Começar</span>
+                <ArrowRight size={20} />
               </Button>
             </article>
           ))}
@@ -1969,7 +1968,7 @@ const ABOUT_CARDS = [
     paragraphs: [
       "Importe listas em PDF, DOCX, Markdown ou TXT com até 10 MB. Reveja o texto extraído antes do sorteio; PDFs digitalizados sem texto precisam de transcrição.",
       "Guarde grupos, ordem, temas e critérios em PDF ou PNG. O PDF usa duas colunas compactas; o PNG mantém os cards dos resultados. Listas grandes geram várias imagens num ZIP. O mata-mata é exportado como mapa completo em PNG ou PDF horizontal. Todos incluem data, QR code do app e a assinatura “Created & Designed by Aquilivio Maria”.",
-      "Instale o RandomGroup no telemóvel pelo botão Instalar quando estiver disponível. No iPhone, use Partilhar → Adicionar ao ecrã principal. Depois do primeiro carregamento completo, os recursos da aplicação ficam disponíveis offline.",
+      "Ao entrar no site, um aviso permite instalar o RandomGroup ou fechar para continuar. No iPhone, use Partilhar → Adicionar ao ecrã principal. Depois do primeiro carregamento completo, os recursos da aplicação ficam disponíveis offline.",
       "Os nomes são processados no dispositivo. O torneio fica guardado neste navegador; limpar os dados do site elimina essa cópia. Os restantes resultados devem ser guardados em PDF antes de sair.",
     ],
   },

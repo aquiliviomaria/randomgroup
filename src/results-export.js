@@ -20,13 +20,14 @@ export async function exportResultsPNG(node, data) {
   const host = document.createElement("div");
   host.className = "results-export";
   host.style.cssText =
-    "position:fixed;left:-50000px;top:0;width:1140px;padding:28px 0;background:white;color:#172239";
+    "position:fixed;left:-50000px;top:0;width:1140px;padding:20px 0;background:white;color:#172239";
   const grid = document.createElement("div");
   grid.className = node.className;
   const header = exportHeader(
     data.title,
     `${data.groups.reduce((n, g) => n + g.members.length, 0)} participantes`,
   );
+  header.style.paddingBottom = "12px";
   const subtitle = document.createElement("p");
   subtitle.className = "export-summary";
   subtitle.textContent = data.subtitle;
@@ -83,13 +84,13 @@ export async function exportResultsPNG(node, data) {
       const height = Math.max(
         ...row.map((card) => card.getBoundingClientRect().height),
       );
-      if (page.length && used + height + 20 > 2500) {
+      if (page.length && used + height + 12 > 2500) {
         pages.push(page);
         page = [];
         used = 0;
       }
       page.push(...row);
-      used += height + 20;
+      used += height + 12;
     }
     if (page.length) pages.push(page);
     const files = {};
