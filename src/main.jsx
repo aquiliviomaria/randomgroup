@@ -244,7 +244,7 @@ function App() {
             <img src={whatsappIcon} alt="" width="20" height="20" />
           </a>
           <a
-            href="https://github.com/Aquilivio"
+            href="https://github.com/aquiliviomaria/randomgroup"
             target="_blank"
             rel="noreferrer"
             aria-label="GitHub de Aquilivio"
