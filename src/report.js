@@ -302,13 +302,17 @@ export function buildReport({
   }
   return doc;
 }
-export async function exportReport(data) {
+export async function exportReport(data, { returnFiles = false } = {}) {
   const [font, boldFont, appQR] = await Promise.all([
     reportFont(),
     loadFont((await import("./assets/report-font-bold.ttf?url")).default),
     brandedQRCode(),
   ]);
-  buildReport({ ...data, font, boldFont, appQR }).save(
-    `RandomGroup-${new Date().toISOString().slice(0, 10)}.pdf`,
-  );
+  const doc = buildReport({ ...data, font, boldFont, appQR });
+  const filename = `RandomGroup-${new Date().toISOString().slice(0, 10)}.pdf`;
+  if (returnFiles)
+    return [
+      new File([doc.output("blob")], filename, { type: "application/pdf" }),
+    ];
+  doc.save(filename);
 }

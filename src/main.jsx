@@ -65,6 +65,7 @@ import { ShareDialog } from "./ShareDialog.jsx";
 import { RankBadge } from "./RankBadge.jsx";
 import { rankAppearance, RESULT_COLORS } from "./result-identity.js";
 import { AppQRCode } from "./AppQRCode.jsx";
+import { ResultsShareButton } from "./ResultsShareButton.jsx";
 
 const MODES = [
   {
@@ -641,7 +642,7 @@ function Journey({
       setReveal(0);
       setResult(groups);
     });
-  const downloadResults = async (format) => {
+  const downloadResults = async (format, returnFiles = false) => {
     setExporting(format);
     try {
       const data = {
@@ -652,16 +653,20 @@ function Journey({
       };
       if (format === "png") {
         const { exportResultsPNG } = await import("./results-export.js");
-        const pages = await exportResultsPNG(resultsRef.current, data);
+        const pages = await exportResultsPNG(resultsRef.current, data, {
+          returnFiles,
+        });
+        if (returnFiles) return pages;
         if (pages > 1)
           notify(
             `${pages} imagens PNG guardadas num ZIP para manter todos os resultados legíveis.`,
           );
       } else {
         const report = await import("./report.js");
-        await report.exportReport(data);
+        return await report.exportReport(data, { returnFiles });
       }
     } catch (e) {
+      if (returnFiles) throw e;
       notify(
         e.message ||
           "Não foi possível exportar os resultados. Tente novamente.",
@@ -1401,6 +1406,12 @@ function Journey({
                   </Button>
                 </>
               )}
+              {!activeTournament && (
+                <ResultsShareButton
+                  disabled={!!exporting}
+                  prepare={(format) => downloadResults(format, true)}
+                />
+              )}
               {activeTournament ? (
                 <Button
                   secondary
@@ -1597,6 +1608,18 @@ function Tournament({
             <Download size={18} />
             {exportingMap === "pdf" ? "A gerar PDF…" : "Mapa em PDF horizontal"}
           </Button>
+          <ResultsShareButton
+            disabled={!!exportingMap}
+            prepare={async (format) => {
+              const { exportTournamentMap } = await import("./map-export.js");
+              return exportTournamentMap(
+                sectionRef.current,
+                tournament,
+                format,
+                { returnFiles: true },
+              );
+            }}
+          />
           <Button secondary onClick={onShare}>
             <QrCode size={18} /> Acesso com senha / QR
           </Button>
@@ -1856,20 +1879,6 @@ function Match({ match, players, game, visible, locked, onWinner, onScore }) {
 }
 const ABOUT_CARDS = [
   {
-    nav: "a origem",
-    icon: Heart,
-    color: "blue",
-    label: "A HISTÓRIA POR TRÁS DO PROJETO",
-    title: "Por que criei o RandomGroup?",
-    paragraphs: [
-      "Sou o representante da minha turma e, muitas vezes, fico responsável por formar grupos para trabalhos e actividades. Ao fazer isso manualmente, alguns colegas queriam ficar com determinados amigos; outros achavam que eu estava a favorecer alguém. Uma tarefa simples acabava em discussões.",
-      "Foi para resolver essa situação que criei o RandTeam: deixar o acaso formar as equipas, de forma transparente, sem escolhas pessoais. Assim, todos têm a mesma oportunidade de participar e conhecer outros colegas.",
-      "O RandomGroup é a evolução dessa ideia. Agora também permite sortear a ordem, distribuir temas, respeitar critérios e acompanhar torneios. A intenção continua a mesma: menos conflitos, mais tempo para fazer coisas juntos.",
-    ],
-    example:
-      "Uma turma, várias personalidades e um trabalho para fazer. Em vez de escolher os amigos, cada pessoa descobre o seu grupo durante o sorteio.",
-  },
-  {
     nav: "Grupos",
     icon: Users,
     color: "blue",
@@ -1975,7 +1984,7 @@ const ABOUT_CARDS = [
 ];
 function About({ onClose, onStart }) {
   const close = useRef(null);
-  const [open, setOpen] = useState(0);
+  const [open, setOpen] = useState(7);
   useLayoutEffect(() => {
     if (open !== null)
       document
@@ -2014,7 +2023,6 @@ function About({ onClose, onStart }) {
     };
   }, []);
   const questions = [
-    "Por que criei o RandomGroup?",
     "Como funciona o sorteio de grupos?",
     "Como sortear a ordem?",
     "Como distribuir os temas?",
@@ -2044,10 +2052,42 @@ function About({ onClose, onStart }) {
           <X />
         </button>
         <header className="faq-header">
-          <h2 id="about-title">Sobre o RandomGroup</h2>
-          <p>Juntos, por acaso.</p>
+          <h2 id="about-title" className="about-brand">
+            <span className="logo-symbol" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>
+              RandomGroup<span className="blue-text">.</span>
+            </span>
+            <span className="about-brand-tagline">Juntos, por acaso.</span>
+          </h2>
         </header>
         <div className="faq-list">
+          <section className={`faq-item ${open === 7 ? "expanded" : ""}`}>
+            <h3>
+              <button
+                aria-expanded={open === 7}
+                aria-controls="faq-content-7"
+                id="faq-question-7"
+                onClick={() => setOpen((current) => (current === 7 ? null : 7))}
+              >
+                Como abrir e partilhar a aplicação?
+                <ChevronRight size={20} />
+              </button>
+            </h3>
+            {open === 7 && (
+              <div
+                id="faq-content-7"
+                role="region"
+                aria-labelledby="faq-question-7"
+                className="faq-content app-qr-content"
+              >
+                <AppQRCode />
+              </div>
+            )}
+          </section>
           {ABOUT_CARDS.map((card, i) => (
             <section
               className={`faq-item ${open === i ? "expanded" : ""}`}
@@ -2093,29 +2133,6 @@ function About({ onClose, onStart }) {
               )}
             </section>
           ))}
-          <section className={`faq-item ${open === 7 ? "expanded" : ""}`}>
-            <h3>
-              <button
-                aria-expanded={open === 7}
-                aria-controls="faq-content-7"
-                id="faq-question-7"
-                onClick={() => setOpen((current) => (current === 7 ? null : 7))}
-              >
-                Como abrir e partilhar a aplicação?
-                <ChevronRight size={20} />
-              </button>
-            </h3>
-            {open === 7 && (
-              <div
-                id="faq-content-7"
-                role="region"
-                aria-labelledby="faq-question-7"
-                className="faq-content app-qr-content"
-              >
-                <AppQRCode />
-              </div>
-            )}
-          </section>
         </div>
         <footer className="faq-footer">
           <span>Aquilivio Maria Cumbe · Criador do projecto</span>

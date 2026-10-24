@@ -25,6 +25,14 @@ De **Aquilivio Maria Cumbe**, Inhambane, Moçambique.
 5. **Acompanhe:** os resultados aparecem com animações, um nome por vez. Pode acelerar ou mostrar tudo.
 6. **Guarde:** descarregue os resultados em PDF ou PNG, com logo, QR code do app e assinatura. Listas grandes em PNG são divididas em imagens num ZIP.
 
+Em todos os modos, **Partilhar resultados** permite preparar PDF ou PNG e abrir a partilha do dispositivo. Quando o navegador não suporta partilha de ficheiros, pode descarregar e enviar pela aplicação que preferir. O mata-mata mantém também o acesso protegido por senha e QR code.
+
+Antes de enviar, o popup mostra a pré-visualização do ficheiro real, incluindo logo, QR code e assinatura. Pode navegar entre páginas do PDF ou imagens PNG, ampliar para conferir os detalhes e abrir o ficheiro completo. A partilha é activada depois de carregar a pré-visualização.
+
+Alterne directamente entre **PDF** e **PNG** no topo da pré-visualização. Os ficheiros preparados são reutilizados enquanto o popup estiver aberto. No telemóvel, afaste ou aproxime dois dedos para ampliar ou reduzir e arraste com um dedo para explorar os nomes e o rodapé; o botão de ajuste repõe a vista completa.
+
+Use **Abrir em tela inteira** para aproveitar todo o ecrã, mantendo os formatos, as páginas e os gestos de zoom. Usa a tela inteira nativa quando disponível e ocupa a área da página nos restantes navegadores. **Sair da tela inteira** ou Escape regressa ao popup sem fechar os resultados.
+
 Ao entrar no site, um aviso permite instalar a aplicação ou fechar para continuar. O aviso volta numa nova visita e fica oculto quando a aplicação é aberta em modo instalado.
 
 ## 🔥 Por que usar?

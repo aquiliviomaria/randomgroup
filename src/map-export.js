@@ -8,7 +8,12 @@ function download(blob, name) {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
-export async function exportTournamentMap(node, tournament, format = "png") {
+export async function exportTournamentMap(
+  node,
+  tournament,
+  format = "png",
+  { returnFiles = false } = {},
+) {
   if (!node) throw new Error("O mapa ainda não está pronto.");
   await Promise.race([
     document.fonts.ready,
@@ -128,6 +133,12 @@ export async function exportTournamentMap(node, tournament, format = "png") {
         subject: tournament.name,
         author: "Aquilivio Maria Cumbe",
       });
+      if (returnFiles)
+        return [
+          new File([doc.output("blob")], `${filename}-mapa.pdf`, {
+            type: "application/pdf",
+          }),
+        ];
       doc.save(`${filename}-mapa.pdf`);
     } else {
       const blob = await new Promise((resolve) =>
@@ -137,6 +148,10 @@ export async function exportTournamentMap(node, tournament, format = "png") {
         throw new Error(
           "O navegador não conseguiu gerar esta imagem. Tente num computador.",
         );
+      if (returnFiles)
+        return [
+          new File([blob], `${filename}-mapa.png`, { type: "image/png" }),
+        ];
       download(blob, `${filename}-mapa.png`);
     }
   } finally {

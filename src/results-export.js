@@ -10,7 +10,11 @@ function save(blob, name) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export async function exportResultsPNG(node, data) {
+export async function exportResultsPNG(
+  node,
+  data,
+  { returnFiles = false } = {},
+) {
   if (!node || node.querySelector(".member-placeholder"))
     throw new Error("Espere pela apresentação de todos os resultados.");
   await Promise.race([
@@ -94,6 +98,7 @@ export async function exportResultsPNG(node, data) {
     }
     if (page.length) pages.push(page);
     const files = {};
+    const prepared = [];
     const filename = `RandomGroup-${data.type}-${new Date().toISOString().slice(0, 10)}`;
     for (const [index, cards] of pages.entries()) {
       grid.replaceChildren(...cards);
@@ -121,19 +126,27 @@ export async function exportResultsPNG(node, data) {
         throw new Error(
           "O navegador não conseguiu gerar a imagem. Tente novamente.",
         );
-      if (pages.length === 1) save(blob, `${filename}.png`);
+      if (returnFiles)
+        prepared.push(
+          new File(
+            [blob],
+            `${filename}${pages.length > 1 ? `-${String(index + 1).padStart(2, "0")}` : ""}.png`,
+            { type: "image/png" },
+          ),
+        );
+      else if (pages.length === 1) save(blob, `${filename}.png`);
       else
         files[`${filename}-${String(index + 1).padStart(2, "0")}.png`] =
           new Uint8Array(await blob.arrayBuffer());
     }
-    if (pages.length > 1) {
+    if (!returnFiles && pages.length > 1) {
       const { zipSync } = await import("fflate");
       save(
         new Blob([zipSync(files, { level: 0 })], { type: "application/zip" }),
         `${filename}.zip`,
       );
     }
-    return pages.length;
+    return returnFiles ? prepared : pages.length;
   } finally {
     host.remove();
   }
