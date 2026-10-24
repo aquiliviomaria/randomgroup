@@ -66,6 +66,7 @@ import { RankBadge } from "./RankBadge.jsx";
 import { rankAppearance, RESULT_COLORS } from "./result-identity.js";
 import { AppQRCode } from "./AppQRCode.jsx";
 import { ResultsShareButton } from "./ResultsShareButton.jsx";
+import { tournamentBadges } from "./tournament-identity.js";
 
 const MODES = [
   {
@@ -1478,6 +1479,12 @@ function Tournament({
   const players = Object.fromEntries(
     tournament.entrants.map((p) => [p.id, p.name]),
   );
+  const badges = tournamentBadges(
+    tournament.code,
+    tournament.entrants.map((p) => p.id),
+    TEAM_ICONS.length,
+    TEAM_COLORS.length,
+  );
   const [history, setHistory] = useState([]);
   const [revision, setRevision] = useState(0);
   const game = tournament.game !== false;
@@ -1495,6 +1502,7 @@ function Tournament({
       key={match.id + match.signature + revision}
       match={match}
       players={players}
+      badges={badges}
       game={game}
       visible={round > 0 || reveal > index * 2}
       locked={!finished}
@@ -1562,7 +1570,10 @@ function Tournament({
                 .matches.map((m) => renderMatch(m, 0, state.rounds.length - 1))}
               {state.champion && (
                 <div className="champion reveal-pop" role="status">
-                  <PlayerBadge id={state.champion} />
+                  <PlayerBadge
+                    id={state.champion}
+                    appearance={badges[state.champion]}
+                  />
                   <small>CAMPEÃO</small>
                   <strong>{players[state.champion]}</strong>
                   <span>Um caminho. Uma conquista.</span>
@@ -1651,14 +1662,13 @@ const TEAM_COLORS = [
   "#c72e65",
   "#206d9b",
 ];
-function PlayerBadge({ id, winner = false, eliminated = false }) {
-  const n = id ? Number(id.replace(/\D/g, "")) - 1 : 0;
-  const Icon = id ? TEAM_ICONS[n % TEAM_ICONS.length] : CircleHelp;
+function PlayerBadge({ id, appearance, winner = false, eliminated = false }) {
+  const Icon = id ? TEAM_ICONS[appearance.icon] : CircleHelp;
   return (
     <span
       className={`player-icon ${winner ? "badge-winner" : ""} ${eliminated ? "badge-eliminated" : ""}`}
       style={{
-        "--team-color": id ? TEAM_COLORS[n % TEAM_COLORS.length] : "#8793a8",
+        "--team-color": id ? TEAM_COLORS[appearance.color] : "#8793a8",
       }}
     >
       <Icon size={26} strokeWidth={2.1} />
@@ -1778,7 +1788,16 @@ function MapConnections({ mapRef, tournament, reveal }) {
     </svg>
   );
 }
-function Match({ match, players, game, visible, locked, onWinner, onScore }) {
+function Match({
+  match,
+  players,
+  badges,
+  game,
+  visible,
+  locked,
+  onWinner,
+  onScore,
+}) {
   const [scores, setScores] = useState(match.scores || ["", ""]);
   const available = !match.bye && match.players.every(Boolean) && !locked;
   return (
@@ -1812,7 +1831,12 @@ function Match({ match, players, game, visible, locked, onWinner, onScore }) {
               aria-pressed={winner}
               onClick={() => onWinner(winner ? null : id)}
             >
-              <PlayerBadge id={id} winner={winner} eliminated={eliminated} />
+              <PlayerBadge
+                id={id}
+                appearance={badges[id]}
+                winner={winner}
+                eliminated={eliminated}
+              />
               <span className="player-name">
                 <strong>
                   {id

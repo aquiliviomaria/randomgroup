@@ -152,7 +152,7 @@ export function SharePreview({
         </div>
       </div>
       <p className="share-preview-touch-hint">
-        Use dois dedos para ampliar e arraste para explorar.{" "}
+        Duplo toque ou dois dedos para ampliar. Arraste para explorar.{" "}
         <span>{Math.round(zoom.scale * 100)}%</span>
       </p>
       <div

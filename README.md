@@ -29,7 +29,7 @@ Em todos os modos, **Partilhar resultados** permite preparar PDF ou PNG e abrir 
 
 Antes de enviar, o popup mostra a pré-visualização do ficheiro real, incluindo logo, QR code e assinatura. Pode navegar entre páginas do PDF ou imagens PNG, ampliar para conferir os detalhes e abrir o ficheiro completo. A partilha é activada depois de carregar a pré-visualização.
 
-Alterne directamente entre **PDF** e **PNG** no topo da pré-visualização. Os ficheiros preparados são reutilizados enquanto o popup estiver aberto. No telemóvel, afaste ou aproxime dois dedos para ampliar ou reduzir e arraste com um dedo para explorar os nomes e o rodapé; o botão de ajuste repõe a vista completa.
+Alterne directamente entre **PDF** e **PNG** no topo da pré-visualização. Os ficheiros preparados são reutilizados enquanto o popup estiver aberto. No telemóvel, toque duas vezes para ampliar e novamente para voltar ao tamanho normal, tanto no popup como em tela inteira. Também pode afastar ou aproximar dois dedos para ampliar ou reduzir e arraste com um dedo para explorar os nomes e o rodapé; o botão de ajuste repõe a vista completa.
 
 Use **Abrir em tela inteira** para aproveitar todo o ecrã, mantendo os formatos, as páginas e os gestos de zoom. Usa a tela inteira nativa quando disponível e ocupa a área da página nos restantes navegadores. **Sair da tela inteira** ou Escape regressa ao popup sem fechar os resultados.
 
@@ -71,3 +71,5 @@ npm run preview  # servir a compilação localmente
 Projecto original: [randteam.vercel.app](https://randteam.vercel.app).
 
 Evolução do projeto [RandTeam](https://github.com/Aquilivio/RandTeam_Sorteio_Inteligente).
+
+Os participantes do Mata-mata recebem ícones e cores variados em cada novo torneio. A identidade de cada participante mantém-se ao avançar, reabrir ou partilhar o torneio e nas exportações.

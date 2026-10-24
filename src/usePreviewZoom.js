@@ -21,14 +21,18 @@ export function usePreviewZoom(source, expanded = false) {
   const frame = useRef(null),
     image = useRef(null),
     gesture = useRef(null),
-    anchor = useRef(null);
+    anchor = useRef(null),
+    lastTap = useRef(null);
   const [scale, setScale] = useState(1),
     [size, setSize] = useState(null);
   const scaleNow = useRef(1);
+  const sizeNow = useRef(null);
   scaleNow.current = scale;
+  sizeNow.current = size;
   const reset = useCallback(() => {
     gesture.current = null;
     anchor.current = null;
+    lastTap.current = null;
     scaleNow.current = 1;
     setScale(1);
     if (frame.current) {
@@ -102,13 +106,53 @@ export function usePreviewZoom(source, expanded = false) {
   }, []);
   useLayoutEffect(applyAnchor, [scale, applyAnchor]);
 
+  const zoomAt = useCallback(
+    (point) => {
+      if (scaleNow.current > 1) {
+        reset();
+        return;
+      }
+      const el = frame.current,
+        img = image.current;
+      if (!el || !img?.naturalWidth) return;
+      const rect = el.getBoundingClientRect(),
+        content = img.getBoundingClientRect();
+      anchor.current = point
+        ? {
+            u: Math.max(
+              0,
+              Math.min(1, (point.x - content.left) / content.width),
+            ),
+            v: Math.max(
+              0,
+              Math.min(1, (point.y - content.top) / content.height),
+            ),
+            x: point.x,
+            y: point.y,
+          }
+        : {
+            u: 0.5,
+            v: 0.5,
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2,
+          };
+      const next = clamp(
+        Math.max(2, 1200 / (sizeNow.current?.width || rect.width)),
+      );
+      scaleNow.current = next;
+      setScale(next);
+    },
+    [reset],
+  );
+
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
-    const begin = (event) => {
+    const begin = (event, allowTap = true) => {
       const img = image.current;
       if (!img?.naturalWidth) return;
       if (event.touches.length >= 2) {
+        lastTap.current = null;
         event.preventDefault();
         const center = midpoint(event.touches),
           rect = img.getBoundingClientRect();
@@ -122,6 +166,10 @@ export function usePreviewZoom(source, expanded = false) {
         gesture.current = {
           x: event.touches[0].clientX,
           y: event.touches[0].clientY,
+          originX: event.touches[0].clientX,
+          originY: event.touches[0].clientY,
+          time: performance.now(),
+          tap: allowTap,
         };
       }
     };
@@ -131,7 +179,7 @@ export function usePreviewZoom(source, expanded = false) {
       event.preventDefault();
       if (event.touches.length >= 2) {
         if (!start.distance) {
-          begin(event);
+          begin(event, false);
           return;
         }
         const center = midpoint(event.touches);
@@ -149,10 +197,17 @@ export function usePreviewZoom(source, expanded = false) {
         setScale(next);
       } else if (event.touches.length === 1) {
         if (start.distance) {
-          begin(event);
+          begin(event, false);
           return;
         }
         const touch = event.touches[0];
+        const tap =
+          start.tap &&
+          Math.hypot(
+            touch.clientX - start.originX,
+            touch.clientY - start.originY,
+          ) <= 12;
+        if (!tap) lastTap.current = null;
         if (scaleNow.current > 1) {
           el.scrollLeft += start.x - touch.clientX;
           el.scrollTop += start.y - touch.clientY;
@@ -160,16 +215,42 @@ export function usePreviewZoom(source, expanded = false) {
           const modal = el.closest('[role="dialog"]');
           if (modal) modal.scrollTop += start.y - touch.clientY;
         }
-        gesture.current = { x: touch.clientX, y: touch.clientY };
+        gesture.current = { ...start, x: touch.clientX, y: touch.clientY, tap };
       }
     };
     const end = (event) => {
+      const start = gesture.current,
+        touch = event.changedTouches[0],
+        now = performance.now();
+      if (
+        !event.touches.length &&
+        start?.tap &&
+        touch &&
+        now - start.time <= 280 &&
+        Math.hypot(
+          touch.clientX - start.originX,
+          touch.clientY - start.originY,
+        ) <= 12
+      ) {
+        const previous = lastTap.current;
+        const point = { x: touch.clientX, y: touch.clientY, time: now };
+        if (
+          previous &&
+          now - previous.time <= 320 &&
+          Math.hypot(point.x - previous.x, point.y - previous.y) <= 28
+        ) {
+          event.preventDefault();
+          lastTap.current = null;
+          zoomAt(point);
+        } else lastTap.current = point;
+      } else lastTap.current = null;
       gesture.current = null;
-      if (event.touches.length) begin(event);
+      if (event.touches.length) begin(event, false);
     };
     const cancel = () => {
       gesture.current = null;
       anchor.current = null;
+      lastTap.current = null;
     };
     el.addEventListener("touchstart", begin, { passive: false });
     el.addEventListener("touchmove", move, { passive: false });
@@ -181,23 +262,11 @@ export function usePreviewZoom(source, expanded = false) {
       el.removeEventListener("touchend", end);
       el.removeEventListener("touchcancel", cancel);
     };
-  }, [applyAnchor]);
+  }, [applyAnchor, zoomAt]);
 
   const toggle = () => {
-    if (scale > 1) {
-      reset();
-      return;
-    }
-    const rect = frame.current.getBoundingClientRect();
-    anchor.current = {
-      u: 0.5,
-      v: 0.5,
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    };
-    const next = clamp(Math.max(2, 1200 / (size?.width || rect.width)));
-    scaleNow.current = next;
-    setScale(next);
+    lastTap.current = null;
+    zoomAt();
   };
   return {
     frame,
