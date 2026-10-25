@@ -52,7 +52,7 @@
         width: 33px;
         height: 34px;
         flex: 0 0 33px;
-        animation: launch-spin 1.6s linear infinite;
+        animation: launch-spin 1.6s linear 3 both;
       }
       .launch-symbol i {
         position: absolute;
@@ -104,14 +104,8 @@
       }
     </style>
     <script>
-      if (
-        (matchMedia("(display-mode: standalone)").matches ||
-          navigator.standalone) &&
-        (matchMedia("(max-width: 900px)").matches ||
-          matchMedia("(pointer: coarse)").matches)
-      ) {
-        document.documentElement.classList.add("app-launching");
-      }
+      window.randomGroupLaunchStartedAt = performance.now();
+      document.documentElement.classList.add("app-launching");
     </script>
   </head>
   <body>

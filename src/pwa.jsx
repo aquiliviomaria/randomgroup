@@ -11,19 +11,25 @@ export function useAppLaunch() {
     }
     let active = true,
       fadeTimer;
-    // Leave enough time for the entrance, then reveal the ready application.
-    const readyTimer = setTimeout(async () => {
-      await Promise.race([
-        document.fonts.ready,
-        new Promise((resolve) => setTimeout(resolve, 1000)),
-      ]);
-      if (!active) return;
-      screen?.classList.add("launch-complete");
-      fadeTimer = setTimeout(() => {
-        screen?.remove();
-        document.documentElement.classList.remove("app-launching");
-      }, 260);
-    }, 700);
+    // Count from the HTML entry, including time spent downloading the app.
+    const elapsed =
+      performance.now() -
+      (window.randomGroupLaunchStartedAt ?? performance.now());
+    const readyTimer = setTimeout(
+      async () => {
+        await Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 1000)),
+        ]);
+        if (!active) return;
+        screen?.classList.add("launch-complete");
+        fadeTimer = setTimeout(() => {
+          screen?.remove();
+          document.documentElement.classList.remove("app-launching");
+        }, 260);
+      },
+      Math.max(0, 5000 - elapsed),
+    );
     return () => {
       active = false;
       clearTimeout(readyTimer);

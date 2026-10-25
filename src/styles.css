@@ -4969,12 +4969,18 @@ input[type="number"] {
   width: 100%;
 }
 .logo-symbol {
-  animation: brand-rotation 9s linear infinite;
+  animation: brand-rotation 2s linear 3 both;
   transform-origin: 50% 50%;
 }
+.app-launching .logo-symbol {
+  animation-play-state: paused;
+}
 @keyframes brand-rotation {
+  from {
+    rotate: 0deg;
+  }
   to {
-    transform: rotate(360deg);
+    rotate: 360deg;
   }
 }
 @media (max-width: 380px) {
