@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { tournamentBadges } from "../src/tournament-identity.js";
+import {
+  tournamentBadges,
+  setParticipantAppearance,
+} from "../src/tournament-identity.js";
 import {
   createTournament,
   setMatchScore,
@@ -39,4 +42,49 @@ test("participant badges survive advancement and restoring the saved tournament"
   const restored = validateTournament(JSON.parse(JSON.stringify(advanced)));
   assert.deepEqual(identities(advanced), badges);
   assert.deepEqual(identities(restored), badges);
+});
+
+test("custom appearance survives scoring, restoring and corrections without changing the draw", () => {
+  const original = createTournament(
+    "Taça",
+    ["Ana", "Paulo", "João", "Sara"],
+    false,
+  );
+  const custom = setParticipantAppearance(original, "p1", {
+    icon: 11,
+    color: 6,
+  });
+  assert.equal(original.entrants[0].appearance, undefined);
+  assert.deepEqual(custom.choices, original.choices);
+  assert.deepEqual(custom.entrants.slice(1), original.entrants.slice(1));
+  const advanced = setMatchScore(custom, "0:0", [5, 2]);
+  const restored = validateTournament(JSON.parse(JSON.stringify(advanced)));
+  assert.deepEqual(restored.entrants[0].appearance, { icon: 11, color: 6 });
+  const corrected = setMatchScore(restored, "0:0", [1, 3]);
+  assert.deepEqual(corrected.entrants[0].appearance, { icon: 11, color: 6 });
+});
+
+test("invalid custom appearances cannot be saved or restored", () => {
+  const t = createTournament("Taça", ["Ana", "Paulo"], false);
+  for (const appearance of [
+    { icon: 12, color: 0 },
+    { icon: 0, color: 7 },
+    { icon: -1, color: 0 },
+    { icon: "1", color: 0 },
+    null,
+  ]) {
+    assert.throws(
+      () => setParticipantAppearance(t, "p1", appearance),
+      /válidos/,
+    );
+    const forged = {
+      ...t,
+      entrants: t.entrants.map((p) => ({ ...p, appearance })),
+    };
+    assert.equal(validateTournament(forged).entrants[0].appearance, undefined);
+  }
+  assert.throws(
+    () => setParticipantAppearance(t, "p999", { icon: 1, color: 1 }),
+    /válidos/,
+  );
 });

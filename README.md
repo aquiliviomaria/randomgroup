@@ -33,7 +33,7 @@ Alterne directamente entre **PDF** e **PNG** no topo da pré-visualização. Os 
 
 Use **Abrir em tela inteira** para aproveitar todo o ecrã, mantendo os formatos, as páginas e os gestos de zoom. Usa a tela inteira nativa quando disponível e ocupa a área da página nos restantes navegadores. **Sair da tela inteira** ou Escape regressa ao popup sem fechar os resultados.
 
-Ao entrar no site, um aviso permite instalar a aplicação ou fechar para continuar. O aviso volta numa nova visita e fica oculto quando a aplicação é aberta em modo instalado.
+Ao entrar no site, um aviso permite instalar a aplicação ou fechar para continuar. O aviso volta numa nova visita e fica oculto quando a aplicação é aberta em modo instalado. No telemóvel, ao abrir o app instalado, um ecrã de carregamento mostra o símbolo a rodar à esquerda de **RandGroup.**, com entrada animada do nome. A abertura desaparece quando a interface está pronta. O logo do app também roda suavemente; a preferência de movimento reduzido é respeitada.
 
 ## 🔥 Por que usar?
 
@@ -72,4 +72,4 @@ Projecto original: [randteam.vercel.app](https://randteam.vercel.app).
 
 Evolução do projeto [RandTeam](https://github.com/Aquilivio/RandTeam_Sorteio_Inteligente).
 
-Os participantes do Mata-mata recebem ícones e cores variados em cada novo torneio. A identidade de cada participante mantém-se ao avançar, reabrir ou partilhar o torneio e nas exportações.
+Os participantes do Mata-mata recebem ícones e cores variados em cada novo torneio. Toque num ícone para escolher outro símbolo e cor e prima **Guardar**. A escolha fica no participante, incluindo na cópia local, no acesso com senha e nos mapas PDF/PNG. A identidade de cada participante mantém-se ao avançar, reabrir ou partilhar o torneio e nas exportações.

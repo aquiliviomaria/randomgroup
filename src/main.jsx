@@ -1,5 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { createPortal } from "react-dom";
 import {
   Shuffle,
   Users,
@@ -60,13 +61,16 @@ import {
 import { readDocument } from "./imports.js";
 import "./styles.css";
 import whatsappIcon from "./assets/whatsapp.png";
-import { PWAControls } from "./pwa.jsx";
+import { PWAControls, useAppLaunch } from "./pwa.jsx";
 import { ShareDialog } from "./ShareDialog.jsx";
 import { RankBadge } from "./RankBadge.jsx";
 import { rankAppearance, RESULT_COLORS } from "./result-identity.js";
 import { AppQRCode } from "./AppQRCode.jsx";
 import { ResultsShareButton } from "./ResultsShareButton.jsx";
-import { tournamentBadges } from "./tournament-identity.js";
+import {
+  tournamentBadges,
+  setParticipantAppearance,
+} from "./tournament-identity.js";
 
 const MODES = [
   {
@@ -158,6 +162,7 @@ function Logo({ onClick }) {
   );
 }
 function App() {
+  useAppLaunch();
   const [mode, setMode] = useState(null);
   const [about, setAbout] = useState(false);
   const [restoreKey, setRestoreKey] = useState(0);
@@ -1485,6 +1490,10 @@ function Tournament({
     TEAM_ICONS.length,
     TEAM_COLORS.length,
   );
+  for (const participant of tournament.entrants) {
+    if (participant.appearance) badges[participant.id] = participant.appearance;
+  }
+  const [editingBadge, setEditingBadge] = useState(null);
   const [history, setHistory] = useState([]);
   const [revision, setRevision] = useState(0);
   const game = tournament.game !== false;
@@ -1503,6 +1512,7 @@ function Tournament({
       match={match}
       players={players}
       badges={badges}
+      onEditBadge={setEditingBadge}
       game={game}
       visible={round > 0 || reveal > index * 2}
       locked={!finished}
@@ -1515,6 +1525,19 @@ function Tournament({
   const sides = state.rounds.slice(0, -1);
   return (
     <>
+      {editingBadge && (
+        <ParticipantAppearancePicker
+          name={players[editingBadge]}
+          appearance={badges[editingBadge]}
+          onClose={() => setEditingBadge(null)}
+          onSave={(appearance) => {
+            update(() =>
+              setParticipantAppearance(tournament, editingBadge, appearance),
+            );
+            setEditingBadge(null);
+          }}
+        />
+      )}
       <section className="tournament-section" ref={sectionRef}>
         <div className="tournament-tools">
           <span>
@@ -1662,6 +1685,122 @@ const TEAM_COLORS = [
   "#c72e65",
   "#206d9b",
 ];
+const TEAM_ICON_NAMES = [
+  "Escudo",
+  "Chama",
+  "Raio",
+  "Órbita",
+  "Gato",
+  "Comando",
+  "Espadas",
+  "Foguetão",
+  "Folha",
+  "Coroa",
+  "Peixe",
+  "Gema",
+];
+const TEAM_COLOR_NAMES = [
+  "Azul",
+  "Violeta",
+  "Laranja",
+  "Verde",
+  "Roxo",
+  "Rosa",
+  "Azul-petróleo",
+];
+
+function ParticipantAppearancePicker({ name, appearance, onSave, onClose }) {
+  const [draft, setDraft] = useState(appearance);
+  const dialog = useRef(null);
+  useEffect(() => {
+    const previous = document.activeElement,
+      overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialog.current.querySelector('[aria-pressed="true"]')?.focus();
+    const key = (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+      }
+      if (event.key === "Tab") {
+        const controls = [...dialog.current.querySelectorAll("button")];
+        const first = controls[0],
+          last = controls.at(-1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", key);
+    return () => {
+      document.body.style.overflow = overflow;
+      document.removeEventListener("keydown", key);
+      previous?.focus();
+    };
+  }, [onClose]);
+  return createPortal(
+    <div
+      className="modal-backdrop badge-picker-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <section
+        ref={dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="badge-picker-title"
+        className="badge-picker"
+      >
+        <button
+          className="close-modal"
+          aria-label="Fechar personalização"
+          onClick={onClose}
+        >
+          <X size={22} />
+        </button>
+        <div className="badge-picker-heading">
+          <PlayerBadge id="preview" appearance={draft} />
+          <div>
+            <h2 id="badge-picker-title">Ícone e cor</h2>
+            <p>{name}</p>
+          </div>
+        </div>
+        <div role="group" aria-label="Ícone" className="badge-icon-options">
+          {TEAM_ICONS.map((Icon, icon) => (
+            <button
+              key={icon}
+              aria-label={TEAM_ICON_NAMES[icon]}
+              aria-pressed={draft.icon === icon}
+              onClick={() => setDraft((d) => ({ ...d, icon }))}
+            >
+              <Icon size={27} />
+            </button>
+          ))}
+        </div>
+        <div role="group" aria-label="Cor" className="badge-color-options">
+          {TEAM_COLORS.map((color, i) => (
+            <button
+              key={color}
+              aria-label={TEAM_COLOR_NAMES[i]}
+              aria-pressed={draft.color === i}
+              style={{ "--swatch": color }}
+              onClick={() => setDraft((d) => ({ ...d, color: i }))}
+            >
+              {draft.color === i && <Check size={20} />}
+            </button>
+          ))}
+        </div>
+        <Button onClick={() => onSave(draft)}>Guardar</Button>
+      </section>
+    </div>,
+    document.body,
+  );
+}
 function PlayerBadge({ id, appearance, winner = false, eliminated = false }) {
   const Icon = id ? TEAM_ICONS[appearance.icon] : CircleHelp;
   return (
@@ -1698,6 +1837,7 @@ function MapConnections({ mapRef, tournament, reveal }) {
           el.dataset.matchId,
           el.getBoundingClientRect(),
         ]),
+n
       );
       const state = bracket(tournament);
       const paths = state.rounds.slice(0, -1).flatMap((r, ri) =>
@@ -1792,6 +1932,7 @@ function Match({
   match,
   players,
   badges,
+  onEditBadge,
   game,
   visible,
   locked,
@@ -1826,10 +1967,10 @@ function Match({
             key={i}
           >
             <button
-              disabled={!available || game}
-              aria-label={`Escolher ${players[id] || "participante por definir"} como vencedor`}
-              aria-pressed={winner}
-              onClick={() => onWinner(winner ? null : id)}
+              className="participant-appearance"
+              aria-label={`Alterar ícone e cor de ${players[id] || "participante por definir"}`}
+              disabled={!id || locked}
+              onClick={() => onEditBadge(id)}
             >
               <PlayerBadge
                 id={id}
@@ -1837,6 +1978,13 @@ function Match({
                 winner={winner}
                 eliminated={eliminated}
               />
+            </button>
+            <button
+              disabled={!available || game}
+              aria-label={`Escolher ${players[id] || "participante por definir"} como vencedor`}
+              aria-pressed={winner}
+              onClick={() => onWinner(winner ? null : id)}
+            >
               <span className="player-name">
                 <strong>
                   {id

@@ -13,8 +13,115 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>RandomGroup</title>
+    <style>
+      #app-launch {
+        display: none;
+      }
+      .app-launching #root {
+        visibility: hidden;
+      }
+      .app-launching #app-launch.launch-complete ~ #root {
+        visibility: visible;
+      }
+      .app-launching #app-launch {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        color: #141b29;
+        transition: opacity 0.25s;
+      }
+      #app-launch.launch-complete {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .launch-brand {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font:
+          800 clamp(24px, 7vw, 34px)/1.2 Manrope,
+          sans-serif;
+        letter-spacing: -1.2px;
+      }
+      .launch-symbol {
+        position: relative;
+        display: inline-block;
+        width: 33px;
+        height: 34px;
+        flex: 0 0 33px;
+        animation: launch-spin 1.6s linear infinite;
+      }
+      .launch-symbol i {
+        position: absolute;
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background: #1557e8;
+        top: 1px;
+        left: 0;
+      }
+      .launch-symbol i:nth-child(2) {
+        background: #16804a;
+        left: 18px;
+      }
+      .launch-symbol i:nth-child(3) {
+        background: #e53943;
+        left: 9px;
+        top: 19px;
+      }
+      .launch-name {
+        animation: launch-enter 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+      }
+      .launch-name b {
+        color: #1557e8;
+      }
+      @keyframes launch-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes launch-enter {
+        from {
+          opacity: 0;
+          transform: translateX(-18px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .launch-symbol,
+        .launch-name {
+          animation: none;
+        }
+        #app-launch {
+          transition: none;
+        }
+      }
+    </style>
+    <script>
+      if (
+        (matchMedia("(display-mode: standalone)").matches ||
+          navigator.standalone) &&
+        (matchMedia("(max-width: 900px)").matches ||
+          matchMedia("(pointer: coarse)").matches)
+      ) {
+        document.documentElement.classList.add("app-launching");
+      }
+    </script>
   </head>
   <body>
+    <div id="app-launch" role="status" aria-label="A carregar RandomGroup">
+      <div class="launch-brand">
+        <span class="launch-symbol" aria-hidden="true"
+          ><i></i><i></i><i></i></span
+        ><span class="launch-name">RandGroup<b>.</b></span>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

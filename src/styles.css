@@ -4874,3 +4874,124 @@ input[type="number"] {
     margin-top: 5px;
   }
 }
+
+/* A participant's appearance is independent from the winner control. */
+.competitor > .participant-appearance {
+  flex: 0 0 auto;
+  border-radius: 13px;
+}
+.participant-appearance:focus-visible,
+.badge-icon-options button:focus-visible,
+.badge-color-options button:focus-visible {
+  outline: 3px solid #1557e8;
+  outline-offset: 3px;
+}
+.participant-appearance:not(:disabled):hover .player-icon {
+  box-shadow: 0 0 0 3px #1557e825;
+}
+.badge-picker-overlay {
+  z-index: 120;
+}
+.badge-picker {
+  position: relative;
+  width: min(100%, 420px);
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  border-radius: 24px;
+  background: white;
+  padding: 28px;
+  box-shadow: 0 24px 80px #14233c26;
+  animation: rise 0.25s both;
+}
+.badge-picker-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-right: 28px;
+  margin-bottom: 24px;
+}
+.badge-picker-heading .player-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  color: var(--team-color);
+  background: color-mix(in srgb, var(--team-color) 10%, white);
+}
+.badge-picker h2 {
+  margin: 0 0 5px;
+  font-size: 22px;
+}
+.badge-picker p {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-weight: 650;
+}
+.badge-icon-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.badge-icon-options button {
+  min-height: 54px;
+  display: grid;
+  place-items: center;
+  background: #f2f5fa;
+  color: #25334a;
+  border: 2px solid transparent;
+  border-radius: 13px;
+}
+.badge-icon-options button[aria-pressed="true"] {
+  background: #eaf0ff;
+  color: #1557e8;
+  border-color: #1557e8;
+}
+.badge-color-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 22px 0;
+}
+.badge-color-options button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: var(--swatch);
+  color: white;
+  box-shadow: 0 0 0 1px #dce3ee;
+}
+.badge-color-options button[aria-pressed="true"] {
+  box-shadow: 0 0 0 2px var(--swatch);
+}
+.badge-picker > .button {
+  width: 100%;
+}
+.logo-symbol {
+  animation: brand-rotation 9s linear infinite;
+  transform-origin: 50% 50%;
+}
+@keyframes brand-rotation {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (max-width: 380px) {
+  .badge-picker {
+    padding: 23px 18px;
+  }
+  .badge-icon-options {
+    gap: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-symbol,
+  .badge-picker {
+    animation: none;
+  }
+}
+/* Keep the chosen identity; green/red outcomes remain on the card and marker. */
+.competitor .player-icon > svg {
+  color: var(--team-color);
+}

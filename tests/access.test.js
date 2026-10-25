@@ -5,6 +5,7 @@ import {
   unlockTournament,
   accessPayload,
 } from "../src/access.js";
+import { setParticipantAppearance } from "../src/tournament-identity.js";
 import { createTournament, setMatchScore, bracket } from "../src/engine.js";
 test("protected snapshots restore names, scores and winners and never contain the password", async () => {
   let t = createTournament(
@@ -12,6 +13,7 @@ test("protected snapshots restore names, scores and winners and never contain th
     ["Ana", "Bruno", "Carla", "Daniel"],
     false,
   );
+  t = setParticipantAppearance(t, "p1", { icon: 8, color: 4 });
   t = setMatchScore(t, "0:0", [5, 2]);
   const password = "uma-senha-forte-2026";
   const payload = await protectTournament(t, password);

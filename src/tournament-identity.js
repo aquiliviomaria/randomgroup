@@ -1,3 +1,35 @@
+export function validAppearance(value) {
+  return (
+    !!value &&
+    Number.isInteger(value.icon) &&
+    value.icon >= 0 &&
+    value.icon < 12 &&
+    Number.isInteger(value.color) &&
+    value.color >= 0 &&
+    value.color < 7
+  );
+}
+
+export function setParticipantAppearance(tournament, id, appearance) {
+  if (
+    !validAppearance(appearance) ||
+    !tournament.entrants.some((p) => p.id === id)
+  )
+    throw new Error("Escolha um ícone e uma cor válidos.");
+  return {
+    ...tournament,
+    updatedAt: new Date().toISOString(),
+    entrants: tournament.entrants.map((p) =>
+      p.id === id
+        ? {
+            ...p,
+            appearance: { icon: appearance.icon, color: appearance.color },
+          }
+        : p,
+    ),
+  };
+}
+
 // The random tournament code seeds a stable visual identity across rounds,
 // reloads, exports and protected copies. This does not affect match draws.
 export function tournamentBadges(code, ids, iconCount = 12, colorCount = 7) {

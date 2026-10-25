@@ -2,6 +2,36 @@ import React, { useEffect, useState } from "react";
 import { Download, RefreshCw, Share, X, Smartphone } from "lucide-react";
 import { registerSW } from "virtual:pwa-register";
 
+export function useAppLaunch() {
+  useEffect(() => {
+    const screen = document.getElementById("app-launch");
+    if (!document.documentElement.classList.contains("app-launching")) {
+      screen?.remove();
+      return;
+    }
+    let active = true,
+      fadeTimer;
+    // Leave enough time for the entrance, then reveal the ready application.
+    const readyTimer = setTimeout(async () => {
+      await Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => setTimeout(resolve, 1000)),
+      ]);
+      if (!active) return;
+      screen?.classList.add("launch-complete");
+      fadeTimer = setTimeout(() => {
+        screen?.remove();
+        document.documentElement.classList.remove("app-launching");
+      }, 260);
+    }, 700);
+    return () => {
+      active = false;
+      clearTimeout(readyTimer);
+      clearTimeout(fadeTimer);
+    };
+  }, []);
+}
+
 export function PWAControls() {
   const [installPrompt, setInstallPrompt] = useState(null);
   const [installed, setInstalled] = useState(

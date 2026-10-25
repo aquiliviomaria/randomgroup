@@ -1,3 +1,5 @@
+import { validAppearance } from "./tournament-identity.js";
+
 export function randomInt(max) {
   const limit = Math.floor(0x100000000 / max) * max;
   const array = new Uint32Array(1);
@@ -327,7 +329,13 @@ export function validateTournament(data) {
         ? data.createdAt
         : new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-    entrants: data.entrants.map(({ id, name }) => ({ id, name })),
+    entrants: data.entrants.map(({ id, name, appearance }) => ({
+      id,
+      name,
+      ...(validAppearance(appearance)
+        ? { appearance: { icon: appearance.icon, color: appearance.color } }
+        : {}),
+    })),
     choices: data.choices,
   };
   return { ...clean, choices: bracket(clean).choices };
